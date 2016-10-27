@@ -38,7 +38,16 @@ install: $(PROGS:%=install-%)
 install-%:
 	install -D $* $(DESTDIR)/$(PREFIX)/bin/$*
 
-pkt-gen-b: pkt-gen-b.o
+pkt-gen-b: pkt-gen-b.o huge_vector.o packet.o -lpcap -lpthread -lm
 
 pkt-gen-b.o: pkt-gen.c
 	$(CC) $(CFLAGS) -DBUSYWAIT -c $^ -o $@
+
+pkt-gen: pkt-gen.o huge_vector.o packet.o
+	$(CC) $(CFLAGS) -o pkt-gen pkt-gen.o huge_vector.o packet.o -lpcap -lpthread -lm
+
+$(SRCDIR)/apps/huge_vector.o: $(SRCDIR)/apps/huge_vector.c $(SRCDIR)/apps/huge_vector.h
+	$(CC) $(CFLAGS) $(SRCDIR)/apps/huge_vector.c
+
+$(SRCDIR)/apps/packet.o: $(SRCDIR)/apps/packet.c $(SRCDIR)/apps/packet.h
+	$(CC) $(CFLAGS) $(SRCDIR)/apps/packet.c
